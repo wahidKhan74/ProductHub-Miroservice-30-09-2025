@@ -1,0 +1,26 @@
+# app config
+spring:
+  application:
+    name: orders-service
+  # datasource config
+  datasource:
+    url: jdbc:mysql://localhost:3306/orders_service_mdb
+    username: root
+    password: root
+  # ddl config
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# port config
+server:
+  port: 5003
+  servlet:
+    context-path: /orders-service
+
+# eureka client config
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

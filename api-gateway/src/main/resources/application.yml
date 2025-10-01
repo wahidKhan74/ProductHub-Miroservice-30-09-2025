@@ -1,0 +1,34 @@
+# app config
+spring:
+  application:
+    name: api-gateway
+  #api gateway config
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: products-service
+              uri: lb://products-service
+              predicates:
+                - Path=/products-service/**
+            - id: orders-service
+              uri: lb://orders-service
+              predicates:
+                - Path=/orders-service/**
+
+# port config
+server:
+  port: 5000
+
+# eureka client config
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
