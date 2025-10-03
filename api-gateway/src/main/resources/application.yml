@@ -20,6 +20,10 @@ spring:
               uri: lb://orders-service
               predicates:
                 - Path=/orders-service/**
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth-service/**
 
 # port config
 server:
