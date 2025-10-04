@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -28,5 +30,10 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<JWTResponse> login(@RequestBody Users user) {
     return authService.login(user);
+  }
+
+  @PostMapping("/introspect")
+  public ResponseEntity<Map<String, Object>> introspect(@RequestBody Map<String, String> request) {
+    return authService.introspect(request);
   }
 }

@@ -1,5 +1,6 @@
 package com.webservice.auth_service.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -44,5 +45,12 @@ public class JWTUtil {
     } catch (JwtException e) {
       return false;
     }
+  }
+
+  public Claims getClaimFromToken(String token) {
+    return Jwts.parser()
+      .setSigningKey(key)
+      .parseClaimsJws(token)
+      .getBody();
   }
 }

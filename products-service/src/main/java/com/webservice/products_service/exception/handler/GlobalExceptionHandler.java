@@ -8,6 +8,8 @@ import com.webservice.products_service.exception.NotFound;
 import com.webservice.products_service.exception.Unauthorised;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -29,6 +31,22 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<ErrorResponse>(errorResponse, httpStatus);
   }
 
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, WebRequest request) {
+    return  buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password", ex.getMessage());
+  }
+
+  // User not found
+  @ExceptionHandler(UsernameNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleUserNotFound(UsernameNotFoundException ex, WebRequest request) {
+    return  buildErrorResponse(HttpStatus.NOT_FOUND, "User not found", ex.getMessage());
+  }
+
+  //JWT errors
+  @ExceptionHandler({ SignatureException.class, IllegalArgumentException.class})
+  public ResponseEntity<ErrorResponse> handleUserNotFound(RuntimeException ex, WebRequest request) {
+    return  buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid or expired JWT token", ex.getMessage());
+  }
   // Generic Exception
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGlobal(Exception ex, WebRequest request) {

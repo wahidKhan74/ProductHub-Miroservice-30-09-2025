@@ -7,6 +7,7 @@ import com.webservice.auth_service.dto.Response;
 import com.webservice.auth_service.entity.Users;
 import com.webservice.auth_service.exception.NotFound;
 import com.webservice.auth_service.repository.UsersRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -36,9 +38,7 @@ public class AuthService {
   }
 
   public ResponseEntity<JWTResponse> login(Users user) {
-
     Optional<Users> userDetails = repo.findByUsername(user.getUsername());
-
     if (userDetails.isPresent()) {
       // set au manager
       authManager.authenticate(
@@ -51,6 +51,27 @@ public class AuthService {
     } else {
       throw new NotFound("User not found: " + user.getUsername());
     }
-
   }
+
+  public ResponseEntity<Map<String, Object>> introspect(Map<String, String> request) {
+    try {
+      String token = request.get("token");
+      Claims claims = jwtUtil.getClaimFromToken(token);
+      Optional<Users> userDetails = repo.findByUsername(claims.getSubject());
+      if(userDetails.isPresent()) {
+        return ResponseEntity.ok(Map.of(
+          "enabled", userDetails.get().isEnable(),
+          "username", claims.getSubject(),
+          "email", userDetails.get().getEmail(),
+          "roles", userDetails.get().getRoles(),
+          "exp", claims.getExpiration().getTime()
+        ));
+      } else {
+        throw new NotFound("User not found: " + claims.getSubject());
+      }
+    } catch (Exception e) {
+      return ResponseEntity.ok(Map.of("active", false));
+    }
+  }
+
 }
